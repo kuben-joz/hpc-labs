@@ -17,40 +17,29 @@ using namespace std;
 static void runFloydWarshallParallel(Graph *graph, int numProcesses, int myRank)
 {
     assert(numProcesses <= graph->numVertices);
-    int m = graph->numVertices;
-    int l = 0;
-    int r = getFirstGraphRowOfProcess(graph->numVertices, numProcesses, 1);
-    int buf[(r - l) * graph->numVertices];
-    r = 0;
     for (int p = 0; p < numProcesses; p++)
     {
-        l = getFirstGraphRowOfProcess(graph->numVertices, numProcesses, p);
-        r = getFirstGraphRowOfProcess(graph->numVertices, numProcesses, p + 1);
-        if (p != myRank)
-        {
-            MPI_Bcast(buf, (r - l) * graph->numVertices, MPI_INT, p, MPI_COMM_WORLD);
-        }
+        int l = getFirstGraphRowOfProcess(graph->numVertices, numProcesses, p);
+        int r = getFirstGraphRowOfProcess(graph->numVertices, numProcesses, p + 1);
         for (int k = 0; k < r - l; ++k)
         {
+            if (p == myRank)
+            {
+                memcpy(graph->extraRow, graph->data[k], graph->numVertices * sizeof(int));
+            }
+            MPI_Bcast(graph->extraRow, graph->numVertices, MPI_INT, p, MPI_COMM_WORLD);
             for (int i = 0; i < graph->lastRowIdxExcl - graph->firstRowIdxIncl; ++i)
             {
-                for (int j = 0; j < m; ++j)
+                for (int j = 0; j < graph->numVertices; ++j)
                 {
-                    int pathSum = graph->data[i][k + l] + p == myRank ? graph->data[k + l][j] : buf[(k * graph->numVertices) + j];
+                    int pathSum = graph->data[i][l + k];
+                    pathSum += p == myRank ? graph->data[k][j] : graph->extraRow[j]; // don't use buffer if we are calculating with self
                     if (graph->data[i][j] > pathSum)
                     {
                         graph->data[i][j] = pathSum;
                     }
                 }
             }
-        }
-        if (p == myRank)
-        {
-            for (int jj = 0; jj < r - l; jj++)
-            {
-                memcpy(&buf[jj * graph->numVertices], graph->data[jj], graph->numVertices * sizeof(int));
-            }
-            MPI_Bcast(buf, (r - l) * graph->numVertices, MPI_INT, p, MPI_COMM_WORLD);
         }
     }
 }

@@ -5,10 +5,10 @@
 #
 
 CC          := mpic++   # use cc on okeanos
-CFLAGS      := -O3 -c -Wall
-LFLAGS      := -O3
+CFLAGS      := -O3 -c -Wall -g
+LFLAGS      := -O3 -g
 # Add new targets below:
-ALL         := hello-world-seq.exe ring.exe benchmark.exe
+ALL         := ring.exe benchmark.exe
 
 all : $(ALL)
 
