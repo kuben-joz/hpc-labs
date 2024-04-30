@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+cmake-build-debug/
+build/
+*.png
+*.bmp
+*.tar.gz
+*.zip
+*.pdf
