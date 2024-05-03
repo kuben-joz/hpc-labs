@@ -1,11 +1,11 @@
-#include <mpi.h>
 #include <iostream>
 #include <bits/stdc++.h>
 #include <fstream>
+#include <mpi.h>
 
 using namespace std;
 
-const int buf_size = 1000000;
+const int buf_size = 10000000;
 const int num_iters = 10;
 const int num_measurments = 100;
 char buf[buf_size];
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         if (!rank)
         {
             sort(times.begin(), times.end());
-            times = vector(times.begin() + 5, times.begin() + times.size() - 5);
+            times = vector<double>(times.begin() + 5, times.begin() + times.size() - 5);
             for (int i = 0; i < times.size(); i++)
             {
                 snprintf(buf, 1000, "%d %d %f\n", i, size, times[i]);

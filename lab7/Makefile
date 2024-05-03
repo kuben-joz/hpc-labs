@@ -4,22 +4,21 @@
 # Further modifications by Krzysztof Rzadca 2018
 #
 
-CC          := mpic++   # use cc on okeanos
-CFLAGS      := -O3 -c -Wall -g
-LFLAGS      := -O3 -g
+CC := mpiCC  # use cc on okeanos
+CFLAGS := -O3 -c -Wall
+LFLAGS := -O3
 # Add new targets below:
-ALL         := ring.exe benchmark.exe
+ALL         := benchmark.exe
 
 all : $(ALL)
 
 
 %.exe : %.o
-	$(CC) $(LFLAGS) -o $@ $<
+	mpiCC $(LFLAGS) -o $@ $<
 
 
 %.o : %.c
-	$(CC) $(CFLAGS) $<
+	mpiCC $(CFLAGS) $<
 
 clean :
 	rm -f *.o *.out *.err $(ALL)
-
