@@ -7,10 +7,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
+#include <mpi.h>
 
 int main(int argc, char *argv[])
 {
-
+    // MPI_Init(&argc, &argv);
     struct timespec spec;
 
     clock_gettime(CLOCK_REALTIME, &spec);
@@ -19,6 +20,6 @@ int main(int argc, char *argv[])
     unsigned t = rand() % 5;
     sleep(t);
     printf("Hello world from %d/%d (slept %u s)!\n", 0, 1, t);
-
+    // MPI_Finalize();
     return 0;
 }

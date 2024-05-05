@@ -7,6 +7,9 @@
 CC := CC  # use cc on okeanos
 CFLAGS := -O3 -c -Wall
 LFLAGS  := -O3
+CC := mpiCC  # use cc on okeanos
+CFLAGS := -O3 -c -Wall
+LFLAGS := -O3
 # Add new targets below:
 ALL         := benchmark.exe
 
@@ -14,12 +17,11 @@ all : $(ALL)
 
 
 %.exe : %.o
-	$(CC) $(LFLAGS) -o $@ $<
+	mpiCC $(LFLAGS) -o $@ $<
 
 
-%.o : %.cpp
-	$(CC) $(CFLAGS) $<
+%.o : %.c
+	mpiCC $(CFLAGS) $<
 
 clean :
 	rm -f *.o *.out *.err $(ALL)
-
