@@ -1,3 +1,4 @@
+'''
 #!/bin/bash -l
 #SBATCH --job-name mim-hello          # this will be shown in the queueing system
 #SBATCH --output "floyd-%j.out"   # stdout redirection
@@ -8,3 +9,10 @@
 #SBATCH --time 00:05:00               # if the job runs longer than this, it'll be killed
 
 srun ./floyd-warshall-par.exe 10
+'''
+
+
+num_nodes = 1
+while num_nodes <= 16:
+    
+    num_nodes <<= 1
