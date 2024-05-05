@@ -4,11 +4,11 @@
 # Further modifications by Krzysztof Rzadca 2018
 #
 
-CC          := mpic++   # use cc on okeanos
-CFLAGS      := -O3 -c -Wall -g
-LFLAGS      := -O3 -g
+CC := CC  # use cc on okeanos
+CFLAGS := -O3 -c -Wall
+LFLAGS  := -O3
 # Add new targets below:
-ALL         := ring.exe benchmark.exe
+ALL         := benchmark.exe
 
 all : $(ALL)
 
@@ -17,7 +17,7 @@ all : $(ALL)
 	$(CC) $(LFLAGS) -o $@ $<
 
 
-%.o : %.c
+%.o : %.cpp
 	$(CC) $(CFLAGS) $<
 
 clean :
