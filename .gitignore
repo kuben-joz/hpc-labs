@@ -10,3 +10,4 @@ build/
 *.exe
 openmpi*
 *.txt
+*.o
