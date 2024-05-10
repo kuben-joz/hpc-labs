@@ -19,6 +19,11 @@ add_executable(laplace-par-sync.exe
         laplace-common.cpp
         laplace-par-sync.cpp)
 
+add_executable(laplace-par-sync-reduce.exe
+        laplace-common.h
+        laplace-common.cpp
+        laplace-par-sync-reduce.cpp)
+
 add_executable(laplace-par-async.exe
         laplace-common.h
         laplace-common.cpp
