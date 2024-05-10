@@ -183,10 +183,10 @@ void GridFragment::printEntireGrid(
         int rowIdx = 0;
         for (rowIdx = this->firstRowIdxIncl; rowIdx < this->lastRowIdxExcl; ++rowIdx)
         {
-            std::cout << std::fixed << std::setprecision(5) << GP(this, rowIdx, 0);
+            std::cout << std::fixed << std::setprecision(10) << GP(this, rowIdx, 0);
             for (int colIdx = 1; colIdx < this->gridDimension; ++colIdx)
             {
-                std::cout << " " << std::fixed << std::setprecision(5) << GP(this, rowIdx, colIdx);
+                std::cout << " " << std::fixed << std::setprecision(10) << GP(this, rowIdx, colIdx);
             }
             std::cout << std::endl;
         }
@@ -206,10 +206,10 @@ void GridFragment::printEntireGrid(
                     PRINT_MSG_TAG,
                     MPI_COMM_WORLD,
                     &status);
-                std::cout << std::fixed << std::setprecision(5) << this->extraRowForPrinting[0];
+                std::cout << std::fixed << std::setprecision(10) << this->extraRowForPrinting[0];
                 for (int colIdx = 1; colIdx < this->gridDimension; ++colIdx)
                 {
-                    std::cout << " " << std::fixed << std::setprecision(5) << this->extraRowForPrinting[colIdx];
+                    std::cout << " " << std::fixed << std::setprecision(10) << this->extraRowForPrinting[colIdx];
                 }
                 std::cout << std::endl;
             }
