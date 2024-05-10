@@ -1,7 +1,7 @@
 .idea/
 .vscode/
 cmake-build-debug/
-build/
+build*
 *.png
 *.bmp
 *.tar.gz
@@ -10,3 +10,4 @@ build/
 *.exe
 openmpi*
 *.o
+.devcontainer/
