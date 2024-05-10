@@ -9,5 +9,4 @@ build/
 *.pdf
 *.exe
 openmpi*
-*.txt
 *.o
