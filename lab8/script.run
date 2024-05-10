@@ -1,0 +1,3 @@
+#!/bin/bash -l
+
+for file in *; do mv "$file" "${file/\"/}"; done
