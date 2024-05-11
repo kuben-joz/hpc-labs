@@ -15,15 +15,24 @@ import subprocess
 srun ./build/$4 $2
 '''
 
-graph_sizes = [10,100,1_000,10_000]
+#graph_sizes = [1_000,10_000,20_000]
+graph_sizes = [100.1000,10000,20000]
+#names = ["laplace-par-async", "laplace-par-sync", "laplace-par-sync-reduce"]
+names = ["laplace-par-async"]
+is_test = False
 
-is_test = True
-
-num_nodes = 1
+num_nodes = 32
 while num_nodes <= 32:
     for s in graph_sizes:
-        if is_test:
-            subprocess.run(['echo', 'run.batch', f'{num_nodes}', f'{s}', '00:05:00', 'laplace-par-sync'])
-        else:
-            subprocess.run(['sbatch', 'run.batch', f'{num_nodes}', f'{s}', '00:05:00', 'laplace-par-sync'])
+        for name in names:
+            if is_test:
+                subprocess.run(['echo', '-N',f'{num_nodes}', '-J', f'{name}-{num_nodes}-{s}', '-o', f'{name}-{num_nodes}-{s}.out', 
+                            '-e', f'{name}-{num_nodes}-{s}.err', '--time', '00:01:00', 'run.batch', f'{s}'])
+            else:
+                subprocess.run(['sbatch', '-N',f'{num_nodes}', '-J', f'{name}-{num_nodes}-{s}', '-o', f'{name}-{num_nodes}-{s}.out', 
+                            '-e', f'{name}-{num_nodes}-{s}.err', '--time', '00:01:00', 'run.batch', f'{s}'])
+        #if num_nodes == 1 and not is_test:
+        #    name = "laplace-seq"
+        #    subprocess.run(['sbatch', '-N',f'{num_nodes}', '-J', f'{name}-{num_nodes}-{s}', '-o', f'{name}-{num_nodes}-{s}.out', 
+        #                '-e', f'{name}-{num_nodes}-{s}.err', '--time', '00:05:00', 'run.batch', f'{s} ' f'{name}'])
     num_nodes <<= 1
