@@ -218,7 +218,7 @@ static std::tuple<int, double> performAlgorithm(
                      MPI_COMM_WORLD);
         }
         MPI_Bcast(&maxDiff, 1, MPI_DOUBLE, numProcesses - 1, MPI_COMM_WORLD);
-    } while (maxDiff > epsilon && numIterations < 1000000);
+    } while (numIterations < 100);
     /* no code changes beyond this point should be needed */
     return std::make_tuple(numIterations, maxDiff);
 }

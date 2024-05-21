@@ -168,7 +168,7 @@ static std::tuple<int, double> performAlgorithm(
         MPI_Allreduce(&maxDiff, &temp, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
         maxDiff = std::max(temp, maxDiff);
 
-    } while (maxDiff > epsilon && numIterations < 1000000);
+    } while (numIterations < 100);
     /* no code changes beyond this point should be needed */
     return std::make_tuple(numIterations, maxDiff);
 }
