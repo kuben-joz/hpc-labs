@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>HPC - MPI - optimizations of supercomputer code</title>
+<!-- 2024-05-06 Mon 13:50 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Krzysztof Rządca" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="cpp-theme.css" rel="stylesheet">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js", "[Contrib]/siunitx/siunitx.js", "[Contrib]/mhchem/mhchem.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        TeX: {extensions: ["AMSmath.js","AMSsymbols.js",  "[Contrib]/siunitx/siunitx.js", "[Contrib]/mhchem/mhchem.js"]},
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">HPC - MPI - optimizations of supercomputer code</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Files</a></li>
+<li><a href="#sec-2">2. Compiler optimizations</a></li>
+<li><a href="#sec-3">3. Using standard numerical libraries</a></li>
+<li><a href="#sec-4">4. Adjusting Slurm job/process/thread allocation</a></li>
+<li><a href="#sec-5">5. Profiling of distributed applications</a></li>
+<li><a href="#sec-6">6. Debugging</a></li>
+<li><a href="#sec-7">7. Bibliography</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Files</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Files for lab 4: <a href="mpi-lab-04.zip">mpi-lab-04.zip</a>
+</p>
+<ul class="org-ul">
+<li><code>lapace-seq.c</code>: sequential implementation of Laplace method (stencil
+with checkerboard algorithm, lab 3). We will benchmark it here. 
+</li>
+<li><code>blas-dmmmult.cpp</code>: a C++ implementation of matrix-matrix
+multiplication that invokes BLAS. You will implement your own
+matrix-matrix multiplication to compete with BLAS.
+</li>
+<li><code>floyd-warshall/</code>: parallel implementation of Floyd-Warshall
+algorithm from lab 2 (here, we will benchmark and later break it)
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Compiler optimizations</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+We assume the Cray Compilation Environment (CCE) in this part of the
+lab. Other compilers have similar options, but usually with different command-line switches.
+</p>
+</div>
+
+<div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Compiler feedback</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+The compiler is usually smart enough to significantly optimize our code, unless we disturb it. You can check the annotated source code with compiler feedback using:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">CC -c -fsave-loopmark laplace-seq.cpp
+</pre>
+</div>
+
+<p>
+Exercise: Look for loops that cannot be unrolled or functions that cannot be inlined. Is there anything you can change to permit these optimizations?
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Floating point optimizations</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Try the following compiler options <code>-O3 -ffp=4</code>. <code>-O3</code> is enabled by default. <code>ffp</code> enables optimizations of some floating point operations that may result in decreased precision.
+</p>
+
+<p>
+Benchmark <code>laplace-seq.c</code> compiled in both variants. (hint: if you use
+a reservation with <code>salloc</code>, use <code>srun -n 1 ./laplace-seq</code> to run just
+a single process on a node).
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Using standard numerical libraries</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+Standard numerical libraries provide optimized implementations of
+common math functions. Supercomputer vendors usually optimize these
+libraries further for their systems. The three most commonly-used libraries are:
+</p>
+<ul class="org-ul">
+<li>BLAS (Basic Linear Algebra Subprograms): operations such as:
+<ul class="org-ul">
+<li>vector-vector operations (\(\bar{y} = \alpha \bar{x} + \bar{y}\)) (level 1)
+</li>
+<li>matrix-vector operations (\(\bar{y} = \alpha A \bar{x} + \beta \bar{y}\)) (level 2)
+</li>
+<li>matrix-matrix operations (\(C  = \alpha A B + \beta C\)) (level 3)
+</li>
+</ul>
+</li>
+<li>LAPACK (Linear Algebra Package): matrix factorizations, solving linear equations, etc. LAPACK uses BLAS internally.
+</li>
+<li>MKL (Math Kernel Library): BLAS, LAPACK, FFT, statistics, data
+fitting, numerical optimization (e.g., the steepest gradient descend), etc.
+</li>
+</ul>
+
+<p>
+<code>blas-dmmmult.cpp</code> shows how to invoke BLAS matrix-matrix multiplication from C++ code. 
+</p>
+
+<p>
+Exercise: implement your own matrix-matrix multiplication as a
+function in <code>blas-dmmmult.cpp</code>. Benchmark both versions (use a single node). Try to optimize your implementation using compiler hints.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Adjusting Slurm job/process/thread allocation</h2>
+<div class="outline-text-2" id="text-4">
+</div><div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1"><span class="section-number-3">4.1</span> Hyperthreading</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Okeanos nodes have 2 processors, each having 12 cores, each core supporting up to 2 threads (hyperthreading). When a core hyperthreads, it can switch between two threads if one of them stalls (e.g.: waits for a data to be transferred from the main memory).
+</p>
+
+<p>
+Exercise: benchmark a distributed program (e.g., your homework from the previous lab) using <code>-tasks-per-node=24</code> (no hyperthreading) and <code>-tasks-per-node=48</code> (hyperthreading).
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2"><span class="section-number-3">4.2</span> Hybrid MPI/OpenMP</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+If your code uses hybrid MPI/OpenMP, try adjusting simultaneously <code>-tasks-per-node</code> (the number of MPI processes per node) and the number of OpenMP threads (<code>export OMP_NUM_THREADS=NNN</code>). In Slurm you need to add to the job description <code>-c NNN</code>, the number of CPUs (=cores) per task. 
+</p>
+
+<p>
+For instance, on okeanos, we can use the following:
+</p>
+
+<p>
+One MPI process per node; OpenMP will use all 24 hardware cores:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">export OMP_NUM_THREADS=24
+srun -tasks-per-node=1 -c 24
+</pre>
+</div>
+
+<p>
+12 MPI processes per node; each process, through OpenMP, will use 4 cores (2 physical, 2 hyperthreaded):
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">export OMP_NUM_THREADS=4
+srun -tasks-per-node=12 -c 4
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> Profiling of distributed applications</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+We will use visual tools. To check that the X connection is working:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">ssh -Y hpc.icm.edu.pl
+ssh -Y okeanos
+xterm # should display a window on your machine
+</pre>
+</div>
+
+<p>
+To enable profiling, you have to start by loading a common module,
+<code>perftools-base</code>.
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">module load perftools-base
+</pre>
+</div>
+
+<p>
+There are two basic modes of profiling: sampling and tracing. When
+sampling, the binary is periodically interrupted to check which
+functions are currently executing. When tracing, the binary is
+instrumented with additional code that logs all function calls.
+</p>
+
+<p>
+We will use the Floyd-Warshall parallel implementation in the examples
+below - but you can use your code instead.
+</p>
+</div>
+
+<div id="outline-container-sec-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> Profiling through sampling</h3>
+<div class="outline-text-3" id="text-5-1">
+<div class="org-src-container">
+
+<pre class="src src-bash">module load perftools-lite 
+make clean; make 
+# some logging from CrayPat/X should be printed as a result of make
+# grab allocation
+salloc --nodes 2 --tasks-per-node 24 --account g96-1905 --time 00:05:00 --reservation=rzadca_6
+# run the instrumented binary inside the allocation
+srun ./floyd-warshall-par.exe 4000
+# end the allocation
+exit
+</pre>
+</div>
+<p>
+The instructions above should generate a detailed profiling log in a
+new sub-directory <code>floyd-warshall-par.exe+SOME_NUMBER</code>.
+</p>
+
+<p>
+To generate a report:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">pat_report -o fw-trace-report.txt floyd-warshall-par.exe+SOME_NUMBER
+</pre>
+</div>
+
+<p>
+To see the report in a (bad) graphical interface:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">app2 floyd-warshall-par-exe+SOME_NUMER/index.ap2
+</pre>
+</div>
+<p>
+(if you don't see a GUI, but an error, make sure you did <code>ssh -Y</code> to
+connect to okeanos).
+</p>
+
+<p>
+What to look for: 
+</p>
+<ul class="org-ul">
+<li>mosaic: which ranks communicate
+</li>
+<li>activity: which ranks spend time computing / transferring / syncing
+</li>
+</ul>
+
+<p>
+Exercise: Introduce some performance bugs to the Floyd-Warshall code, e.g. a rank that computes more than other ranks. See how it influences the <code>app2</code> profiling.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> Profiling through tracing:</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="org-src-container">
+
+<pre class="src src-bash">module unload perftools-lite
+module load perftools
+make clean; make
+pat_build ./floyd-warshall-par.exe
+# grab allocation
+salloc --nodes 2 --tasks-per-node 24 --account g96-1905 --time 00:05:00 --reservation=rzadca_6
+# run the instrumented library inside the allocation
+srun ./floyd-warshall-par.exe+pat 4000 # a binary instrumented for sampling
+# end allocation
+exit
+pat_report -o fw-report.txt floyd-warshall-par.exe+pat+SOME_NUMBER
+</pre>
+</div>
+
+<p>
+Now, a new file - <code>build-options.apa</code> - is generated under <code>floyd-warshall-par.exe+pat+SOME_NUMBER</code>.
+Uncomment the lines starting with -T that specify functions to trace:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-text"># 89.89%&nbsp;&nbsp;&nbsp;&nbsp; floydWarshallPar<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;580 bytes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -T floydWarshallPar$$CFE_id_5a05476a_main<br>
+#&nbsp;&nbsp;&nbsp;&nbsp;580 bytes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -T floydWarshallPar$$CFE_id_5a05476a_main<br>
+</p>
+</pre>
+</div>
+
+<p>
+If there  are no such functions, find the correct symbol names by:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">nm floyd-warshall-par.exe+pat | grep runF
+</pre>
+</div>
+<p>
+Example output:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-text">0000000000466a60 T _Z24runFloydWarshallParallelP5Graphii<br>
+</p>
+</pre>
+</div>
+
+<p>
+And then put into <code>build-options.apa</code>: 
+</p>
+<div class="org-src-container">
+
+<pre class="src src-text">-T _Z24runFloydWarshallParallelP5Graphii<br>
+</p>
+</pre>
+</div>
+
+<p>
+Rebuild the binary according to <code>build-options.apa</code>:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">pat_build -O floyd-warshall-par.exe+pat+SOME_NUMBER/build-options.apa # creates an +apa binary
+</pre>
+</div>
+
+<p>
+run the <code>apa</code> binary:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">srun ./floyd-warshall-par.exe+apa 4000 # runs this new binary
+</pre>
+</div>
+
+<p>
+create a report:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">pat_report -o fw-report-apa floyd-warshall-par.exe+apa+SOME_NUMER/
+</pre>
+</div>
+
+<p>
+To see the report in a (bad) graphical interface:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">app2 floyd-warshall-par.exe+apa+SOME_NUMER/index.ap2
+</pre>
+</div>
+
+<p>
+Compare the report with the sampling-based report. Check the HW
+counters analysis.
+</p>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> Debugging</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+There is a debugger accessible in an allocation. You start with asking
+for an allocation:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">salloc --nodes 2 --tasks-per-node 24  --account g96-1905 --time 00:05:00 --reservation=rzadca_6
+</pre>
+</div>
+
+<p>
+Then, load the module containing the debuger and launch the debugger:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">module load gdb4hpc
+gdb4hpc
+</pre>
+</div>
+
+<p>
+Once the debugger is ready, start an MPI application (here, with 4 MPI
+processes) (remember to compile the binary with <code>-g</code> flag):
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-bash">dbg all&gt; launch $pset{4}  -a "10" ./floyd-warshall-par.exe
+</pre>
+</div>
+
+<p>
+Create a breakpoint at a function:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">dbg all&gt; break runFloydWarshallParallel
+</pre>
+</div>
+
+<p>
+Continue executing until the breakpoint:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">dbg all&gt; continue
+</pre>
+</div>
+
+<p>
+Print variables:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">dbg all&gt; list
+dbg all&gt; print $pset::myRank
+dbg all&gt; print $pset{0}::myRank
+dbg all&gt; print $pset{2}::myRank
+</pre>
+</div>
+
+<p>
+Switch focus to a particular process:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-bash">dbg all&gt; focus $pset{0}
+</pre>
+</div>
+</div>
+</div>
+
+
+<div id="outline-container-sec-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> Bibliography</h2>
+<div class="outline-text-2" id="text-7">
+<ul class="org-ul">
+<li>Cray Compiling Environment: <a href="https://pubs.cray.com/content/S-2179/8.5/cray-c-and-c++-reference-manual-85/the-cray-compiling-environment">https://pubs.cray.com/content/S-2179/8.5/cray-c-and-c++-reference-manual-85/the-cray-compiling-environment</a> 
+</li>
+<li>BLAS: <a href="http://www.netlib.org/blas/">http://www.netlib.org/blas/</a>
+</li>
+<li>LAPACK: <a href="http://www.netlib.org/lapack/">http://www.netlib.org/lapack/</a>
+</li>
+<li>MKL: <a href="https://software.intel.com/en-us/mkl">https://software.intel.com/en-us/mkl</a>
+</li>
+<li>CRAY PAT: <a href="https://pubs.cray.com/content/S-2529/17.05/xctm-series-programming-environment-user-guide-1705-s-2529/using-the-cray-performance-measurement-and-analysis-tools">https://pubs.cray.com/content/S-2529/17.05/xctm-series-programming-environment-user-guide-1705-s-2529/using-the-cray-performance-measurement-and-analysis-tools</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2023/05/26</p>
+<p class="author">Author: Krzysztof Rządca</p>
+<p class="date">Created: 2024-05-06 Mon 13:50</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.3.50.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
