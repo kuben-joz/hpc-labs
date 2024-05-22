@@ -2,6 +2,6 @@
 #SBATCH --account "g96-1905"          # the number of our grant
 #SBATCH --tasks-per-node 1           # each node is 2 socket, 12 core, so we want 24 tasks on each node
 #SBATCH --mincpus 1
-#SBATCH --mem 16000   # Try MB maybe if doesnt work
+#SBATCH --mem 1024   # Try MB maybe if doesnt work
 
-srun ./floyd-warshall-par.exe $1
+srun ./floyd-warshall-seq.exe $1
