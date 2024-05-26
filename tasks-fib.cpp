@@ -86,14 +86,14 @@ int main()
 {
     const long n = 30;
     tbb::tick_count seq_start_time = tbb::tick_count::now();
-    long s_fib = seq_fib(n);
+    long s_fib = seq_trib(n);
     tbb::tick_count seq_end_time = tbb::tick_count::now();
     double seq_time = (seq_end_time - seq_start_time).seconds();
     std::cout << "trib " << s_fib << std::endl;
     std::cout << "seq time " << seq_time << "[s]" << std::endl;
 
     tbb::tick_count par_start_time = tbb::tick_count::now();
-    long p_fib = par_fib(n);
+    long p_fib = par_trib(n);
     tbb::tick_count par_end_time = tbb::tick_count::now();
     double par_time = (par_end_time - par_start_time).seconds();
     std::cout << "p_trib " << p_fib << std::endl;
