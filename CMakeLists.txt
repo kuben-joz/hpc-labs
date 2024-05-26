@@ -24,7 +24,4 @@ target_link_libraries(nqueens_count tbb_debug)
 add_executable(nqueens_report nqueens_report.cpp)
 target_link_libraries(nqueens_report tbb_debug)
 
-add_executable(nqueens_seq nqueens_seq.cpp)
-target_link_libraries(nqueens_seq tbb_debug)
-
 install(TARGETS DESTINATION .)

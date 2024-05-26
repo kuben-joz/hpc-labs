@@ -16,7 +16,7 @@
 
 using namespace std;
 
-const int board_size = 14;
+int board_size = 13;
 
 // Indexed by column. Value is the row where the queen is placed,
 // or -1 if no queen.
@@ -131,19 +131,24 @@ void recursive_solve_seq(Board &partial_board, int col, long &solutions)
     }
 }
 
-int main()
+int main(int argc, char **argv)
 {
+    if (argc)
+    {
+        board_size = strtol(argv[1], nullptr, 0);
+    }
     Board board{};
     initialize(board, board_size);
-    atomic_long solutions(0);
+    atomic_long solutions_par(0);
 
     tbb::tick_count par_start_time = tbb::tick_count::now();
-    recursive_solve_par(board, 0, solutions);
+    recursive_solve_par(board, 0, solutions_par);
     tbb::tick_count par_end_time = tbb::tick_count::now();
-    double seq_time = (par_end_time - par_start_time).seconds();
-    std::cout << "par time: " << seq_time << "[s]" << std::endl;
+    double par_time = (par_end_time - par_start_time).seconds();
+    cout << "Board size: " << board_size << endl;
+    std::cout << "par time: " << par_time << "[s]" << std::endl;
 
-    std::cout << "solution count: " << solutions << std::endl;
+    std::cout << "solution count: " << solutions_par << std::endl;
 
     long solutions_seq = 0;
     tbb::tick_count seq_start_time = tbb::tick_count::now();
@@ -152,5 +157,5 @@ int main()
     double seq_time = (seq_end_time - seq_start_time).seconds();
     std::cout << "seq time: " << seq_time << "[s]" << std::endl;
 
-    std::cout << "solution count: " << solutions << std::endl;
+    std::cout << "solution count: " << solutions_seq << std::endl;
 }
