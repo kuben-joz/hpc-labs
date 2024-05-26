@@ -26,7 +26,7 @@ long seq_fib(long n)
     }
 }
 
-int par_fib(long n)
+long par_fib(long n)
 {
     if (n < 2)
     {
@@ -61,15 +61,11 @@ long seq_trib(long n)
     }
 }
 
-int[3] par_trib(long n)
+long par_trib(long n)
 {
-    int res[3];
     if (n < 2)
     {
-        for (int i = n; i > n - 3; i--)
-        {
-            res[i - (n - 2)] = n > 0 ? n : 0;
-        }
+        return n > 0 ? n : 0;
     }
     else
     {
@@ -81,7 +77,7 @@ int[3] par_trib(long n)
               { y = par_trib(n - 2); }); // spawn another task
         g.run([&]
               { z = par_trib(n - 3); }); // spawn another task
-        g.wait();                        // wait for both tasks to complete
+        g.wait();                        // wait for all tasks to complete
         return x + y + z;
     }
 }

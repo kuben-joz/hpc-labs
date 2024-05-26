@@ -18,11 +18,9 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
 
-#RUN mkdir /opt
-#
-#WORKDIR /opt
-#
-#RUN wget https://github.com/oneapi-src/oneTBB/releases/download/v2021.12.0/oneapi-tbb-2021.12.0-lin.tgz && tar xvzf oneapi-tbb-2021.12.0-lin.tgz
+RUN wget -P /opt https://github.com/oneapi-src/oneTBB/releases/download/v2021.12.0/oneapi-tbb-2021.12.0-lin.tgz \
+        && tar xvzf /opt/oneapi-tbb-2021.12.0-lin.tgz -C /opt \
+        && echo "\nsource /opt/oneapi-tbb-2021.12.0/env/vars.sh\n" >> /etc/bash.bashrc
 #
 #WORKDIR /opt/oneapi-tbb-2021.12.0
 #

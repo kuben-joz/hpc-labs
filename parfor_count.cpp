@@ -29,38 +29,32 @@ int main()
     tbb::tick_count seq_start_time = tbb::tick_count::now();
     for (long i = 1; i < limit; ++i)
     {
-        if(is_prime(i)) {
+        if (is_prime(i))
+        {
             num_p++;
         }
     }
     tbb::tick_count seq_end_time = tbb::tick_count::now();
     double seq_time = (seq_end_time - seq_start_time).seconds();
     std::cout << "seq time for " << limit << " " << seq_time << "[s]" << std::endl;
-    cout << "Num primes found seq: " << num_p<< endl;
-    mutex m; // used for forloop partition analysis in colab
-    long start_idxs[limit];
-    long end_idxs[limit];
-    atomic_long idx(0);
+    cout << "Num primes found seq: " << num_p << endl;
     atomic_long num_primes(0);
     tbb::tick_count par_start_time = tbb::tick_count::now();
-    tbb::parallel_for(                                         // execute a parallel for
-        tbb::blocked_range<long>(1, limit),                    // pon a range from 1 to limit
-        [&m, &num_primes](const tbb::blocked_range<long> &r) { // inside a loop, for a partial range r,
-            // run this lambda
-            // m.lock(); used for forloop partition analysis in colab
-            // cout << "The range is " << r.begin() << "-" << r.end() << " i.e. of size " << r.end() - r.begin() << endl; used for forloop partition analysis in colab
-            // m.unlock(); used for forloop partition analysis in colab
-
-            change this to use an atomic to get palce in array for results
+    tbb::parallel_for(                           // execute a parallel for
+        tbb::blocked_range<long>(1, limit),      // pon a range from 1 to limit
+        [&](const tbb::blocked_range<long> &r) { // inside a loop, for a partial range r,
             long temp_num_p = 0;
             for (long i = r.begin(); i != r.end(); ++i)
             {
                 if (is_prime(i))
                 {
-                    temp_num_p++; // this seems just as fast as doing num_primes++
+                    temp_num_p++;
                 }
             }
-            num_primes += temp_num_p;
+            if (temp_num_p)
+            {
+                num_primes.fetch_add(temp_num_p, memory_order_relaxed);
+            }
         });
     tbb::tick_count par_end_time = tbb::tick_count::now();
     double par_time = (par_end_time - par_start_time).seconds();
