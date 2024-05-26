@@ -1,2 +1,0 @@
-Running the Floyd-Warshall algorithm for a graph with 128 vertices.
-The time required for the Floyd-Warshall algorithm on a 128-node graph with 1 process(es): 0.00247645

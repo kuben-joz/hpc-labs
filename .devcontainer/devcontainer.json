@@ -6,36 +6,21 @@
 		"dockerfile": "Dockerfile"
 	},
 	"features": {
-		"ghcr.io/devcontainers/features/nvidia-cuda:1": {
-			"installNvtx": true,
-			"installToolkit": true,
-			"cudaVersion": "12.2",
-			"cudnnVersion": "8.9.5.29"
-		},
-		"ghcr.io/devcontainers/features/sshd:1": {}
-	},
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"ms-vscode.cpptools",
-				"ms-vscode.cpptools-extension-pack"
-			]
-		}
-	},
-	"mounts": [
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
-	],
-	"runArgs": [
-		"--network=host",
-	],
+		"ghcr.io/devcontainers/features/git:1": {}
+	}
+
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
+
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
+
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "gcc -v",
+
 	// Configure tool-specific properties.
 	// "customizations": {},
+
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }

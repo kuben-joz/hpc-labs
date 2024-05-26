@@ -14,8 +14,16 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 # RUN su vscode -c "${VCPKG_ROOT}/vcpkg install <your-port-name-here>"
 
 # [Optional] Uncomment this section to install additional packages.
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-     && apt-get -y install --no-install-recommends openmpi-bin openmpi-common libopenmpi-dev
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+#     && apt-get -y install --no-install-recommends <your-package-list-here>
 
 
-     
+#RUN mkdir /opt
+#
+#WORKDIR /opt
+#
+#RUN wget https://github.com/oneapi-src/oneTBB/releases/download/v2021.12.0/oneapi-tbb-2021.12.0-lin.tgz && tar xvzf oneapi-tbb-2021.12.0-lin.tgz
+#
+#WORKDIR /opt/oneapi-tbb-2021.12.0
+#
+#RUN cmake --build . --config Release
