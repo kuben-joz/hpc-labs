@@ -79,7 +79,7 @@ void recursive_solve_par(Board &partial_board, int col, oneapi::tbb::concurrent_
     if (col == b_size)
     {
         // num_solutions.fetch_add(1, memory_order_relaxed);
-        solutions.emplace(partial_board.begin(), partial_board.end());
+        //solutions.emplace(partial_board.begin(), partial_board.end());
     }
     else if (col < par_depth)
     {
@@ -150,6 +150,7 @@ int main(int argc, char **argv)
     std::cout << "par time: " << par_time << "[s]" << std::endl;
 
     std::cout << "solution count: " << solutions_par.unsafe_size() << std::endl;
+    
 
     vector<vector<int>> solutions_seq;
     tbb::tick_count seq_start_time = tbb::tick_count::now();

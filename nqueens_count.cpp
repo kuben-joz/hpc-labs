@@ -78,7 +78,7 @@ void recursive_solve_par(Board &partial_board, int col, atomic_long &num_solutio
     if (col == b_size)
     {
         // num_solutions.fetch_add(1, memory_order_relaxed);
-        num_solutions.fetch_add(1, memory_order_relaxed);
+        // num_solutions.fetch_add(1, memory_order_relaxed);
     }
     else if (col < par_depth)
     {
