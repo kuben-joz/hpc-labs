@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>HPC - TBB lab 2 - parallel do &amp; thread local</title>
+<!-- 2024-05-29 Wed 16:06 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Krzysztof Rządca" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link href="cpp-theme.css" rel="stylesheet">
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">HPC - TBB lab 2 - parallel do &amp; thread local</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Adding work on the go: <code>parallel_for_each</code></a></li>
+<li><a href="#sec-2">2. Per-thread local variables: <code>enumerable_thread_specific</code></a></li>
+<li><a href="#sec-3">3. Concurrent containers</a></li>
+<li><a href="#sec-4">4. Bibliography</a></li>
+</ul>
+</div>
+</div>
+<p>
+Files for TBB lab 2: <a href="tbb-lab-02.zip">tbb-lab-02.zip</a>
+</p>
+
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Adding work on the go: <code>parallel_for_each</code></h2>
+<div class="outline-text-2" id="text-1">
+<p>
+<code>parallel_for</code> (introduced in the previous lab) allows processing in
+parallel some workload known in advance. Sometimes, however, we don't
+know how much total work is available. Imagine, for instance,
+traversing a graph to process each edge. If the graph is stored as
+adjacency lists, it's hard to know how many edges are there without
+traversing the whole graph. Of course, we could generate a <code>tbb::task</code>
+for each edge, but TBB offers a more convenient solution,
+<code>tbb::parallel_for_each</code>.
+</p>
+
+<p>
+<code>tbb::parallel_for_each(first, last, body)</code> applies <code>body()</code> over
+elements from the sequence <code>[first,last)</code>. The function object <code>body</code>
+takes one or two arguments: (1) the item; (2) a <code>tbb::feeder</code> through
+which <code>body</code> can dynamically add (feed) further elements to process.
+</p>
+
+<p>
+<code>pardo.cpp</code> shows an example of traversing a DAG:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-cpp"><span class="org-constant">tbb</span>::parallel_for_each(&amp;node, &amp;node+1, [&amp;graph, &amp;par_edge_count,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&amp;stdout_mutex]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (<span class="org-keyword">const</span> <span class="org-type">node_t</span>&amp; <span class="org-variable-name">node</span>, <span class="org-constant">tbb</span>::<span class="org-type">feeder</span>&lt;<span class="org-type">node_t</span>&gt;&amp; <span class="org-variable-name">feeder</span>) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">this mutex is just for stdout formatting</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-constant">std</span>::<span class="org-type">scoped_lock</span> <span class="org-function-name">lock</span>(stdout_mutex);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-constant">std</span>::cout &lt;&lt; <span class="org-string">"Now processing: "</span> &lt;&lt; node &lt;&lt; <span class="org-string">"."</span> &lt;&lt; <span class="org-constant">std</span>::endl;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">scoped_lock mutex will be released here</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-keyword">for</span> (<span class="org-keyword">const</span> <span class="org-keyword">auto</span>&amp; <span class="org-variable-name">neighbor</span> : graph[node]) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="org-comment-delimiter">// </span><span class="org-comment">this mutex is just for stdout formatting</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="org-constant">std</span>::<span class="org-type">scoped_lock</span> <span class="org-function-name">lock</span>(stdout_mutex);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="org-constant">std</span>::cout &lt;&lt; <span class="org-string">"edge: "</span> &lt;&lt; node &lt;&lt; <span class="org-string">"-&gt;"</span> &lt;&lt; neighbor<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;&lt; <span class="org-constant">std</span>::endl;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">scoped_lock mutex will be released here</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;par_edge_count++;&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">this variable is atomic&lt;int&gt;, so no races</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;feeder.add(neighbor);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;);<br>
+</p>
+</pre>
+</div>
+
+<p>
+Exercise: rewrite <code>nqueens.cpp</code> from the previous lab to use <code>parallel_for_each</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Per-thread local variables: <code>enumerable_thread_specific</code></h2>
+<div class="outline-text-2" id="text-2">
+<p>
+When individual tasks need to update a shared data structure, to avoid
+data races, we need to either apply mutual exclusion, atomic variables, or
+lock-free data structures. However, sometimes the update can be
+deferred until the parallel work is over. TBB proposes a convenient
+mechanism called <code>tbb::enumerable_thread_specific&lt;T&gt;</code>. A task is
+executed by a thread and each thread accesses its local field using
+the <code>local()</code> method of the enumerable. After the parallel work is
+done, one can just iterate through the enumerable.
+</p>
+
+<p>
+<code>pardo_th_sp.cpp</code> updates the DAG traversal with per-thread counters:
+</p>
+<div class="org-src-container">
+
+<pre class="src src-cpp"><span class="org-constant">tbb</span>::parallel_for_each(&amp;node, &amp;node+1, [&amp;graph, &amp;counters, &amp;stdout_mutex]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (<span class="org-keyword">const</span> <span class="org-type">node_t</span>&amp; <span class="org-variable-name">node</span>, <span class="org-constant">tbb</span>::<span class="org-type">feeder</span>&lt;<span class="org-type">node_t</span>&gt;&amp; <span class="org-variable-name">feeder</span>) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">this mutex is just for stdout formatting</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-constant">std</span>::<span class="org-type">scoped_lock</span> <span class="org-function-name">lock</span>(stdout_mutex);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-constant">std</span>::cout &lt;&lt; <span class="org-string">"Now processing: "</span> &lt;&lt; node &lt;&lt; <span class="org-string">"."</span> &lt;&lt; <span class="org-constant">std</span>::endl;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">scoped_lock mutex will be released here</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-keyword">for</span> (<span class="org-keyword">const</span> <span class="org-keyword">auto</span>&amp; <span class="org-variable-name">neighbor</span> : graph[node]) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">this mutex is just for stdout formatting</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-constant">std</span>::<span class="org-type">scoped_lock</span> <span class="org-function-name">lock</span>(stdout_mutex);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="org-constant">std</span>::cout &lt;&lt; <span class="org-string">"edge: "</span> &lt;&lt; node &lt;&lt; <span class="org-string">"-&gt;"</span> &lt;&lt; neighbor<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;&lt; <span class="org-constant">std</span>::endl;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;&nbsp;<span class="org-comment-delimiter">// </span><span class="org-comment">scoped_lock mutex will be released here</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(counters.local())++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;feeder.add(neighbor);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;);<br>
+<span class="org-type">int</span> <span class="org-variable-name">par_edge_count</span> = 0;<br>
+<span class="org-keyword">for</span> (<span class="org-keyword">const</span> <span class="org-keyword">auto</span>&amp; <span class="org-variable-name">counter</span> : counters) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;par_edge_count += counter;<br>
+}<br>
+</p>
+</pre>
+</div>
+
+<p>
+Exercise: apply <code>enumerable_thread_specific</code> to <code>nqueens.cpp</code>.
+</p>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Concurrent containers</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+TBB defines a few data structures optimized for parallel access.  A
+naive solution is to have a standard data structure and a global lock:
+whenever a task needs to access the data, it waits on the lock until
+other tasks finish.  Such sequenced access is suboptimal, as
+many data structures naturally support parallelism (consider for
+example adding elements to a hash map).  A concurrent data structure
+uses more fine-grained locking to optimize access performance. The
+actual locking mechanism depends on implementation but rarely uses
+operating system-level mutexes (as they are too heavy).  Consistency
+models extend the standard semantics of concurrent operations on such
+data structures.
+</p>
+
+
+<p>
+TBB defines 3 classes of concurrent containers:
+</p>
+<ol class="org-ol">
+<li>Queues, like <code>tbb::concurrent_queue</code> we saw in the previous class.
+</li>
+<li>Maps like <code>tbb::concurrent_unordened_map</code> and <code>tbb::concurrent_hash_map</code>.
+</li>
+<li>A vector: <code>tbb::concurrent_vector</code>.
+</li>
+</ol>
+
+<p>
+Exercise: Solve the single source shortest path problem in a
+randomly-initialized graph. Use <code>tbb::concurrent_hash_map</code> (or
+<code>tbb::concurrent_unordered_map</code>) that maps a node to its distance from
+the source; and <code>tbb::concurrent_priority_queue</code> to keep a list of
+nodes to visit. See
+<a href="https://stackoverflow.com/questions/23501591/tbb-concurrent-hash-map-find-insert">https://stackoverflow.com/questions/23501591/tbb-concurrent-hash-map-find-insert</a>
+for example.
+</p>
+</div>
+</div>
+
+
+<div id="outline-container-sec-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> Bibliography</h2>
+<div class="outline-text-2" id="text-4">
+<ul class="org-ul">
+<li>Concurrent containers: <a href="https://software.intel.com/en-us/node/506169">https://software.intel.com/en-us/node/506169</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Date: 2023/06/02</p>
+<p class="author">Author: Krzysztof Rządca</p>
+<p class="date">Created: 2024-05-29 Wed 16:06</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.3.50.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
