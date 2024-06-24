@@ -3,5 +3,24 @@
         {
             "path": "."
         }
-    ]
+    ],
+    "settings": {
+        "files.associations": {
+            "*.cu": "cuda-cpp",
+            "*.py": "python",
+            "array": "cpp",
+            "deque": "cpp",
+            "list": "cpp",
+            "string": "cpp",
+            "unordered_map": "cpp",
+            "vector": "cpp",
+            "string_view": "cpp",
+            "initializer_list": "cpp",
+            "ostream": "cpp"
+        }
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": []
+    }
 }

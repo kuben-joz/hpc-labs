@@ -13,3 +13,11 @@ target_link_libraries(pardo tbb_debug)
 
 add_executable(pardo_th_sp pardo_th_sp.cpp)
 target_link_libraries(pardo_th_sp tbb_debug)
+
+add_executable(nqueens_count nqueens_count.cpp)
+target_link_libraries(nqueens_count tbb_debug)
+
+add_executable(nqueens_report nqueens_report.cpp)
+target_link_libraries(nqueens_report tbb_debug)
+
+install(TARGETS DESTINATION .)

@@ -77,24 +77,24 @@ void recursive_solve_par(Board &partial_board, int col, atomic_long &num_solutio
     int b_size = partial_board.size();
     if (col == b_size)
     {
-        // num_solutions.fetch_add(1, memory_order_relaxed);
+        num_solutions.fetch_add(1, memory_order_relaxed);
         // num_solutions.fetch_add(1, memory_order_relaxed);
     }
     else if (col < par_depth)
     {
-        tbb::task_group g;
-        for (int tested_row = 0; tested_row < b_size; tested_row++)
-        {
-
-            if (check_col(partial_board, col, tested_row))
-            {
-                g.run([&partial_board, col, &num_solutions, tested_row]
-                      { Board board_cp(partial_board.begin(), partial_board.end());
-                        board_cp[col] = tested_row;
-                        recursive_solve_par(board_cp, col + 1, num_solutions); });
-            }
-        }
-        g.wait();
+        tbb::parallel_for(tbb::blocked_range<long>(0, b_size),
+                        [&partial_board, col, &num_solutions](const tbb::blocked_range<long> &r)
+                            {
+                                for (long tested_row = r.begin(); tested_row < r.end(); tested_row++)
+                                {
+                                    if (check_col(partial_board, col, tested_row))
+                                    {
+                                        Board board_cp(partial_board.begin(), partial_board.end());
+                                        board_cp[col] = tested_row;
+                                        recursive_solve_par(board_cp, col + 1, num_solutions);
+                                    }
+                                }
+                            });
     }
     else
     {
@@ -108,6 +108,47 @@ void recursive_solve_par(Board &partial_board, int col, atomic_long &num_solutio
         }
     }
 }
+
+void recursive_solve_par2(Board &partial_board, int col, tbb::enumerable_thread_specific<long> &counters)
+{
+    // std::cout << "rec solve col " << col << std::endl;
+    // pretty_print(b_partial);
+
+    int b_size = partial_board.size();
+    if (col == b_size)
+    {
+        counters.local()++;
+    }
+    else if (col < par_depth)
+    {
+        tbb::parallel_for(tbb::blocked_range<long>(0, b_size),
+                        [&partial_board, col, &counters](const tbb::blocked_range<long> &r)
+                            {
+                                for (long tested_row = r.begin(); tested_row < r.end(); tested_row++)
+                                {
+                                    if (check_col(partial_board, col, tested_row))
+                                    {
+                                        Board board_cp(partial_board.begin(), partial_board.end());
+                                        board_cp[col] = tested_row;
+                                        recursive_solve_par2(board_cp, col + 1, counters);
+                                    }
+                                }
+                            });
+    }
+    else
+    {
+        for (int tested_row = 0; tested_row < b_size; tested_row++)
+        {
+            if (check_col(partial_board, col, tested_row))
+            {
+                partial_board[col] = tested_row;
+                recursive_solve_par2(partial_board, col + 1, counters);
+            }
+        }
+    }
+}
+
+
 
 void recursive_solve_seq(Board &partial_board, int col, long &solutions)
 {
@@ -133,12 +174,13 @@ void recursive_solve_seq(Board &partial_board, int col, long &solutions)
 
 int main(int argc, char **argv)
 {
-    if (argc)
+    if (argc>1)
     {
         board_size = strtol(argv[1], nullptr, 0);
     }
     Board board{};
     initialize(board, board_size);
+    // --------------- Parallel for -------------------------
     atomic_long solutions_par(0);
 
     tbb::tick_count par_start_time = tbb::tick_count::now();
@@ -149,7 +191,23 @@ int main(int argc, char **argv)
     std::cout << "par time: " << par_time << "[s]" << std::endl;
 
     std::cout << "solution count: " << solutions_par << std::endl;
+    // -------------- Parallel for with enum thread spec --------------------- 
+    tbb::enumerable_thread_specific<long> counters;
+    long counters_sum = 0;
+    tbb::tick_count counters_start_time = tbb::tick_count::now();
+    recursive_solve_par2(board, 0, counters);
+    for(const auto& c : counters) {
+        counters_sum += c;
+    }
+    tbb::tick_count counters_end_time = tbb::tick_count::now();
+    double counters_time = (counters_end_time - counters_start_time).seconds();
+    cout << "Board size: " << board_size << endl;
+    std::cout << "par with counters time: " << counters_time << "[s]" << std::endl;
 
+    std::cout << "solution count: " << counters_sum << std::endl;
+
+
+    // ----------------- Sequential --------------------------------------
     long solutions_seq = 0;
     tbb::tick_count seq_start_time = tbb::tick_count::now();
     recursive_solve_seq(board, 0, solutions_seq);
@@ -158,4 +216,5 @@ int main(int argc, char **argv)
     std::cout << "seq time: " << seq_time << "[s]" << std::endl;
 
     std::cout << "solution count: " << solutions_seq << std::endl;
+    return 0;
 }

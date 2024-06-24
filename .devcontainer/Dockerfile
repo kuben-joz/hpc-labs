@@ -21,6 +21,8 @@ RUN if [ "${REINSTALL_CMAKE_VERSION_FROM_SOURCE}" != "none" ]; then \
 RUN wget -P /opt https://github.com/oneapi-src/oneTBB/releases/download/v2021.12.0/oneapi-tbb-2021.12.0-lin.tgz \
         && tar xvzf /opt/oneapi-tbb-2021.12.0-lin.tgz -C /opt \
         && echo "\nsource /opt/oneapi-tbb-2021.12.0/env/vars.sh\n" >> /etc/bash.bashrc
+
+#RUN apt-get update && apt-get install openmpi-bin openmpi-doc libopenmpi-dev 
 #
 #WORKDIR /opt/oneapi-tbb-2021.12.0
 #
