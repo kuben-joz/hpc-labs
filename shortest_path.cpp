@@ -45,7 +45,7 @@ map_t dijkstra_par(graph_t &G, int N)
     {
         map_t::accessor a;
         map.insert(a, i);
-        a->second = i ? 0 : INT_MAX;
+        a->second = LONG_LONG_MAX * (!i);
     }
     while (!heap.empty())
     {
@@ -90,7 +90,7 @@ map<int, long long> dijkstra_seq(graph_t &G, int N)
     map<int, long long> map;
     for (int i = 0; i < N; i++)
     {
-        map[i] = i ? 0 : LONG_LONG_MAX;
+        map[i] = LONG_LONG_MAX * (!i);
     }
     heap.emplace(0, 0);
     while (!heap.empty())
