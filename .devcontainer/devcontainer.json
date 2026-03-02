@@ -6,7 +6,7 @@
 		"dockerfile": "Dockerfile"
 	},
 	"features": {
-		"ghcr.io/devcontainers/features/nvidia-cuda:1": {
+		"ghcr.io/devcontainers/features/nvidia-cuda:3": {
 			"installNvtx": true,
 			"installToolkit": true,
 			"cudaVersion": "12.2",
